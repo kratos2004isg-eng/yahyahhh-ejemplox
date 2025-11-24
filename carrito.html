@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michil Coffee - Carrito</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        body { padding-top: 56px; min-height: 100vh; display: flex; flex-direction: column; background-color: #f8f9fa; }
+        main { flex-grow: 1; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">Michil Coffee</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="menu.html">Menú</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="carrito.html" title="Ver Carrito">
+                                <i class="bi bi-cart-fill"></i> Carrito
+                                <span class="badge bg-danger rounded-pill" id="cart-count">0</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item" id="login-button"><a class="nav-link" href="login.html">Iniciar Sesión</a></li>
+                        <li class="nav-item d-none" id="user-display"><a class="nav-link" href="index.html" id="user-name">Usuario Invitado</a></li>
+                        <li class="nav-item d-none" id="logout-button"><a class="nav-link" href="#" id="logout-link">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <h1 class="mb-4 text-center">🛍️ Tu Carrito de Compras</h1>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush" id="cart-items-list">
+                            <li class="list-group-item text-center text-muted">El carrito está vacío. ¡Ve al <a href="menu.html">Menú</a> para añadir productos!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                     <button class="btn btn-outline-danger" id="clear-cart-btn">Vaciar Carrito</button>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card bg-light shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">Resumen del Pedido</h4>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item bg-light d-flex justify-content-between">
+                                Subtotal: <span id="cart-subtotal">$0.00</span>
+                            </li>
+                            <li class="list-group-item bg-light d-flex justify-content-between fw-bold text-primary">
+                                Total: <span id="cart-total">$0.00</span>
+                            </li>
+                        </ul>
+                        
+                        <h5 class="mb-3 mt-4">Datos de Envío</h5>
+                        <form id="checkout-form">
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Dirección Completa</label>
+                                <input type="text" class="form-control" id="address" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Teléfono de Contacto</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg" id="checkout-btn" disabled>
+                                    Comprar y Pedir a Domicilio
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="small mb-0">© 2025 Michil Coffee - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+   <script>
+    // =========================================================
+    // 1. DEFINICIÓN DE FUNCIONES (Deben estar aquí, fuera de DOMContentLoaded)
+    // =========================================================
+
+    // Función para actualizar el contador del navbar
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const cartCountElement = document.getElementById('cart-count');
+        
+        let totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+
+        if (cartCountElement) {
+            cartCountElement.textContent = totalItems;
+            if (totalItems === 0) {
+                cartCountElement.style.display = 'none';
+            } else {
+                cartCountElement.style.display = 'inline';
+            }
+        }
+    }
+    
+    // Función para dibujar el carrito
+    function renderCart() {
+        const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const list = document.getElementById('cart-items-list');
+        const subtotalElement = document.getElementById('cart-subtotal');
+        const totalElement = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        
+        list.innerHTML = ''; // Limpiamos la lista
+
+        if (cart.length === 0) {
+            list.innerHTML = '<li class="list-group-item text-center text-muted">El carrito está vacío. ¡Ve al <a href="menu.html">Menú</a> para añadir productos!</li>';
+            subtotalElement.textContent = '$0.00';
+            totalElement.textContent = '$0.00';
+            checkoutBtn.disabled = true;
+            return;
+        }
+
+        let subtotal = 0;
+
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            // Usando toLocaleString para el formato de moneda CLP
+            li.innerHTML = `
+                <div>
+                    <h6 class="mb-0">${item.name}</h6>
+                    <small class="text-muted">$${item.price.toLocaleString('es-CL')} c/u</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="me-3">Cant: ${item.quantity}</span>
+                    <span class="fw-bold me-3 text-success">$${itemTotal.toLocaleString('es-CL')}</span>
+                    <button class="btn btn-sm btn-danger delete-item" data-index="${index}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+
+        const total = subtotal; 
+        subtotalElement.textContent = `$${subtotal.toLocaleString('es-CL')}`;
+        totalElement.textContent = `$${total.toLocaleString('es-CL')}`;
+        checkoutBtn.disabled = false;
+        
+        // Asignar eventos de eliminación
+        document.querySelectorAll('.delete-item').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                removeItem(index);
+            });
+        });
+    }
+    
+    // Eliminar un ítem del carrito
+    function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+        cart.splice(index, 1); 
+        localStorage.setItem('cartItems', JSON.stringify(cart));
+        renderCart(); 
+        updateCartCount(); 
+    }
+    
+    // Función de Cerrar Sesión (Necesaria para ser llamada en el listener)
+    function handleLogout(event) {
+        event.preventDefault(); 
+        localStorage.removeItem('currentUser'); 
+        window.location.href = 'index.html'; 
+    }
+
+    // =========================================================
+    // 2. LÓGICA PRINCIPAL Y LLAMADAS (TODO DENTRO DE ESTE BLOQUE)
+    // =========================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- 2.1. LÓGICA DE SESIÓN (La que ya tenías) ---
+        const userName = localStorage.getItem('currentUser');
+        const loginButton = document.getElementById('login-button');
+        const userDisplay = document.getElementById('user-display');
+        const userNameLink = document.getElementById('user-name');
+        const logoutButton = document.getElementById('logout-button');
+        const logoutLink = document.getElementById('logout-link');
+
+        if (userName) {
+            if(loginButton) loginButton.classList.add('d-none');
+            if(userDisplay) userDisplay.classList.remove('d-none');
+            if(userNameLink) userNameLink.textContent = userName;
+            if(logoutButton) logoutButton.classList.remove('d-none');
+        } else {
+            if(loginButton) loginButton.classList.remove('d-none');
+            if(userDisplay) userDisplay.classList.add('d-none');
+            if(logoutButton) logoutButton.classList.add('d-none');
+        }
+        
+        if (logoutLink) {
+            logoutLink.addEventListener('click', handleLogout); 
+        }
+
+        // --- 2.2. LÓGICA DEL CARRITO (Llamadas de inicialización) ---
+        
+        // Inicializar el carrito al cargar la página
+        renderCart();
+        updateCartCount();
+        
+        // --- 2.3. MANEJADORES DE EVENTOS (Están seguros aquí adentro) ---
+        
+        // Vaciar todo el carrito
+        const clearCartBtn = document.getElementById('clear-cart-btn');
+        if (clearCartBtn) {
+            clearCartBtn.addEventListener('click', function() {
+                if (confirm("¿Estás seguro que deseas vaciar completamente el carrito?")) {
+                    localStorage.removeItem('cartItems');
+                    renderCart();
+                    updateCartCount();
+                    alert("Carrito vaciado.");
+                }
+            });
+        }
+
+        // Simular el proceso de checkout
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const address = document.getElementById('address').value;
+                const phone = document.getElementById('phone').value;
+                
+                // Simulación: Borrar carrito y mostrar mensaje
+                localStorage.removeItem('cartItems');
+                renderCart();
+                updateCartCount();
+                
+                alert(`¡Pedido realizado con éxito!\n\nSe enviará a: ${address}\nTe contactaremos al: ${phone}\n\nGracias por tu compra en Michil Coffee.`);
+            });
+        }
+    });
+</script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

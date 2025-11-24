@@ -1,0 +1,5 @@
+miau@cafe.com
+contraseña: 123
+
+admin@cafe.com
+contraseña: admin

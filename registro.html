@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michil Coffee - Crear Cuenta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        body { 
+            padding-top: 56px; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa; 
+        }
+        main {
+            flex-grow: 1; 
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            padding: 40px 0;
+        }
+
+        .registro-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px; 
+        }
+
+        .registro-container h2 {
+            margin-bottom: 30px;
+            color: #495057;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">Michil Coffee</a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="menu.html">Menú</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.html" title="Ver Carrito">
+                            <i class="bi bi-cart-fill"></i> Carrito
+                            <span class="badge bg-danger rounded-pill" id="cart-count">0</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item" id="login-button">
+                            <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item d-none" id="user-display">
+                            <a class="nav-link" href="index.html" id="user-name">Usuario Invitado</a> 
+                        </li>
+                        <li class="nav-item d-none" id="logout-button">
+                            <a class="nav-link" href="#" id="logout-link">Cerrar Sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="registro-container">
+            <h2>Crear una Nueva Cuenta</h2>
+            <form id="registro-form">
+                
+                <div class="mb-3">
+                    <label for="usernameInput" class="form-label">Nombre de Usuario</label>
+                    <input type="text" class="form-control" id="usernameInput" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="emailInput" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="passwordInput" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="passwordInput" required>
+                </div>
+                
+                <button type="submit" class="btn btn-dark w-100 mt-3">Registrarse</button>
+
+                <p class="text-center mt-3 mb-0">
+                    ¿Ya tienes cuenta? <a href="login.html" class="text-decoration-none">Iniciar Sesión</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="small mb-1">
+                © 2025 Michil Coffee - Todos los derechos reservados
+            </p>
+            <p class="small mb-1">
+                Michil Coffee
+            </p>
+            <p class="small mb-0">
+                Teléfono: +56 9 6506 5089
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Función para actualizar el contador de artículos del carrito
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const cartCountElement = document.getElementById('cart-count');
+    
+    // Contamos el total de ítems (no de tipos de ítems)
+    let totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+
+    if (cartCountElement) {
+        cartCountElement.textContent = totalItems;
+        // Ocultar si está vacío
+        if (totalItems === 0) {
+            cartCountElement.style.display = 'none';
+        } else {
+            cartCountElement.style.display = 'inline';
+        }
+    }
+}
+
+// Llama a la función al cargar la página
+updateCartCount();
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('currentUser');
+            const loginButton = document.getElementById('login-button');
+            const userDisplay = document.getElementById('user-display');
+            const userNameLink = document.getElementById('user-name');
+            const logoutButton = document.getElementById('logout-button');
+            const logoutLink = document.getElementById('logout-link');
+
+            if (userName) {
+                if(loginButton) loginButton.classList.add('d-none');
+                if(userDisplay) userDisplay.classList.remove('d-none');
+                if(userNameLink) userNameLink.textContent = userName;
+                if(logoutButton) logoutButton.classList.remove('d-none');
+            } else {
+                if(loginButton) loginButton.classList.remove('d-none');
+                if(userDisplay) userDisplay.classList.add('d-none');
+                if(logoutButton) logoutButton.classList.add('d-none');
+            }
+            const registroForm = document.getElementById('registro-form');
+            if (registroForm) {
+                registroForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); 
+                    const username = document.getElementById('usernameInput').value;
+                    localStorage.setItem('currentUser', username);
+                    alert(`¡Cuenta creada con éxito para ${username}!`);
+                    window.location.href = 'index.html'; 
+                });
+            }
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    localStorage.removeItem('currentUser'); 
+                    window.location.href = 'index.html'; 
+                });
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
